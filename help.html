@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Warehouse SaaS Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Warehouse SaaS</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="feature-detection.html">Feature Detection</a></li>
+                    <li><a href="my-projects.html">My Projects</a></li>
+                    <li><a href="help.html" class="active">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Help & Documentation</h1>
+            <p>Learn how to use the Warehouse SaaS Platform effectively</p>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <div class="help-container">
+                <div class="help-sidebar">
+                    <h3>Topics</h3>
+                    <ul>
+                        <li><a href="#getting-started" class="active">Getting Started</a></li>
+                        <li><a href="#uploading-images">Uploading Images</a></li>
+                        <li><a href="#feature-detection">Feature Detection</a></li>
+                        <li><a href="#dimensions">Setting Dimensions</a></li>
+                        <li><a href="#file-formats">File Formats</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="help-content">
+                    <div id="getting-started" class="help-section">
+                        <h2>Getting Started</h2>
+                        <p>Welcome to the Warehouse SaaS Platform! This guide will help you understand how to use our platform to generate detailed AutoCAD site plans from aerial images.</p>
+                        
+                        <h3>Basic Workflow</h3>
+                        <ol>
+                            <li>Upload an aerial image of your warehouse site</li>
+                            <li>Set the real-world dimensions of the area shown in the image</li>
+                            <li>Select which features you want to detect (railroads, drainage, utilities, etc.)</li>
+                            <li>Generate your site plan</li>
+                            <li>Download the results in your preferred format (DXF, DWG, PDF)</li>
+                        </ol>
+                        
+                        <div class="help-image">
+                            <img src="images/workflow-diagram.jpg" alt="Workflow Diagram">
+                        </div>
+                    </div>
+
+                    <div id="uploading-images" class="help-section">
+                        <h2>Uploading Images</h2>
+                        <p>For best results, please follow these guidelines when uploading aerial images:</p>
+                        
+                        <h3>Recommended Image Specifications</h3>
+                        <ul>
+                            <li><strong>Format:</strong> JPEG, PNG, or GIF</li>
+                            <li><strong>Resolution:</strong> At least 1200 x 1200 pixels</li>
+                            <li><strong>Size:</strong> Maximum 10MB</li>
+                            <li><strong>Clarity:</strong> Clear, well-lit images with good contrast</li>
+                            <li><strong>Angle:</strong> Top-down aerial view preferred</li>
+                        </ul>
+                        
+                        <div class="tip-box">
+                            <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                            <p>Images from Google Earth, drone photography, or satellite imagery work best. Ensure the image is taken during daylight hours with minimal cloud cover for optimal feature detection.</p>
+                        </div>
+                    </div>
+
+                    <div id="feature-detection" class="help-section">
+                        <h2>Feature Detection</h2>
+                        <p>Our AI-powered system can detect various features in your warehouse site images:</p>
+                        
+                        <div class="features-grid">
+                            <div class="feature-item">
+                                <i class="fas fa-train"></i>
+                                <h4>Railroads</h4>
+                                <p>Rail lines, spurs, and loading areas</p>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <i class="fas fa-water"></i>
+                                <h4>Drainage Systems</h4>
+                                <p>Drainage channels, retention ponds, and water management systems</p>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <i class="fas fa-plug"></i>
+                                <h4>Utilities</h4>
+                                <p>Power lines, utility boxes, and service connections</p>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <i class="fas fa-chair"></i>
+                                <h4>Outdoor Furniture</h4>
+                                <p>Benches, tables, and other outdoor fixtures</p>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <i class="fas fa-fence"></i>
+                                <h4>Fences/Barriers</h4>
+                                <p>Security fencing, barriers, and perimeter structures</p>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <i class="fas fa-tree"></i>
+                                <h4>Trees/Vegetation</h4>
+                                <p>Trees, shrubs, and landscaped areas</p>
+                            </div>
+                        </div>
+                        
+                        <p>Select only the features you need for your site plan. Processing time increases with the number of features selected.</p>
+                    </div>
+
+                    <div id="dimensions" class="help-section">
+                        <h2>Setting Dimensions</h2>
+                        <p>Accurate dimensions are crucial for creating properly scaled AutoCAD files:</p>
+                        
+                        <h3>Required Measurements</h3>
+                        <ul>
+                            <li><strong>Width:</strong> The horizontal measurement of the area shown in the image</li>
+                            <li><strong>Height:</strong> The vertical measurement of the area shown in the image</li>
+                            <li><strong>Length:</strong> The depth measurement for 3D representations</li>
+                            <li><strong>Unit:</strong> Select meters, feet, or yards based on your preference</li>
+                        </ul>
+                        
+                        <div class="tip-box warning">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Important</h4>
+                            <p>If you don't know the exact dimensions, you can estimate them using Google Maps or other mapping tools. Inaccurate dimensions will result in incorrectly scaled AutoCAD files.</p>
+                        </div>
+                    </div>
+
+                    <div id="file-formats" class="help-section">
+                        <h2>File Formats</h2>
+                        <p>We provide your site plans in multiple formats to suit your needs:</p>
+                        
+                        <div class="format-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Format</th>
+                                        <th>Description</th>
+                                        <th>Best For</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>DXF</td>
+                                        <td>Drawing Exchange Format - compatible with most CAD software</td>
+                                        <td>Cross-platform compatibility</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DWG</td>
+                                        <td>Native AutoCAD format with full feature support</td>
+                                        <td>AutoCAD users</td>
+                                    </tr>
+                                    <tr>
+                                        <td>PDF</td>
+                                        <td>Portable Document Format for viewing and sharing</td>
+                                        <td>Presentations and documentation</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="troubleshooting" class="help-section">
+                        <h2>Troubleshooting</h2>
+                        <p>Common issues and their solutions:</p>
+                        
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <div class="accordion-header">Image upload fails</div>
+                                <div class="accordion-content">
+                                    <p>Check that your image meets our size and format requirements. Try reducing the file size or converting to a different format.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <div class="accordion-header">Features not detected correctly</div>
+                                <div class="accordion-content">
+                                    <p>Try using a clearer image with better lighting and contrast. Some features may be difficult to detect if they're obscured or too small in the image.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <div class="accordion-header">Download button not working</div>
+                                <div class="accordion-content">
+                                    <p>Ensure your browser allows downloads from our site. Try using a different browser if the issue persists.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <div class="accordion-header">Processing takes too long</div>
+                                <div class="accordion-content">
+                                    <p>Processing time depends on image size, complexity, and the number of features selected. Try selecting fewer features or using a smaller image.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="faq" class="help-section">
+                        <h2>Frequently Asked Questions</h2>
+                        
+                        <div class="faq-item">
+                            <h3>How accurate is the feature detection?</h3>
+                            <p>Our AI system typically achieves 85-95% accuracy depending on image quality and feature clarity. Results may require minor manual adjustments for perfect precision.</p>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <h3>Can I edit the generated files?</h3>
+                            <p>Yes, all downloaded files can be edited in AutoCAD or other compatible CAD software.</p>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <h3>Is there a limit to how many projects I can create?</h3>
+                            <p>Standard accounts can create up to 10 projects per month. Premium accounts have unlimited project creation.</p>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <h3>How long are my projects stored?</h3>
+                            <p>Projects are stored for 30 days on standard accounts and indefinitely on premium accounts.</p>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <h3>Can I use satellite imagery?</h3>
+                            <p>Yes, satellite imagery works well as long as it has sufficient resolution and clarity.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Warehouse SaaS Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

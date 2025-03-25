@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects - Warehouse SaaS Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Warehouse SaaS</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="feature-detection.html">Feature Detection</a></li>
+                    <li><a href="my-projects.html" class="active">My Projects</a></li>
+                    <li><a href="help.html">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>My Projects</h1>
+            <p>View and manage your warehouse site plans</p>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <div class="projects-container">
+                <div class="projects-header">
+                    <h2>Your Recent Projects</h2>
+                    <div class="search-filter">
+                        <input type="text" placeholder="Search projects..." id="project-search">
+                        <select id="project-filter">
+                            <option value="all">All Projects</option>
+                            <option value="recent">Recent</option>
+                            <option value="completed">Completed</option>
+                            <option value="in-progress">In Progress</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">
+                            <img src="images/project-thumbnail-1.jpg" alt="Project 1">
+                        </div>
+                        <div class="project-details">
+                            <h3>North Seattle Warehouse</h3>
+                            <p class="project-date">Created: March 20, 2025</p>
+                            <div class="project-features">
+                                <span class="feature-tag">Railroads</span>
+                                <span class="feature-tag">Utilities</span>
+                                <span class="feature-tag">Drainage</span>
+                            </div>
+                            <div class="project-actions">
+                                <a href="#" class="btn btn-secondary btn-sm">View</a>
+                                <a href="#" class="btn btn-primary btn-sm">Download</a>
+                                <a href="#" class="btn btn-outline btn-sm">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-image">
+                            <img src="images/project-thumbnail-2.jpg" alt="Project 2">
+                        </div>
+                        <div class="project-details">
+                            <h3>Portland Distribution Center</h3>
+                            <p class="project-date">Created: March 15, 2025</p>
+                            <div class="project-features">
+                                <span class="feature-tag">Barriers</span>
+                                <span class="feature-tag">Vegetation</span>
+                                <span class="feature-tag">Furniture</span>
+                            </div>
+                            <div class="project-actions">
+                                <a href="#" class="btn btn-secondary btn-sm">View</a>
+                                <a href="#" class="btn btn-primary btn-sm">Download</a>
+                                <a href="#" class="btn btn-outline btn-sm">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-image">
+                            <img src="images/project-thumbnail-3.jpg" alt="Project 3">
+                        </div>
+                        <div class="project-details">
+                            <h3>Chicago Logistics Hub</h3>
+                            <p class="project-date">Created: March 10, 2025</p>
+                            <div class="project-features">
+                                <span class="feature-tag">Railroads</span>
+                                <span class="feature-tag">Utilities</span>
+                                <span class="feature-tag">Barriers</span>
+                            </div>
+                            <div class="project-actions">
+                                <a href="#" class="btn btn-secondary btn-sm">View</a>
+                                <a href="#" class="btn btn-primary btn-sm">Download</a>
+                                <a href="#" class="btn btn-outline btn-sm">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card new-project">
+                        <div class="new-project-content">
+                            <i class="fas fa-plus-circle"></i>
+                            <h3>Create New Project</h3>
+                            <p>Start a new warehouse site plan</p>
+                            <a href="feature-detection.html" class="btn btn-primary">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#" class="next">Next &raquo;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Warehouse SaaS Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

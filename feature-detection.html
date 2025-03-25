@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Detection - Warehouse SaaS Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/upload.css">
+    <link rel="stylesheet" href="css/download.css">
+    <link rel="stylesheet" href="css/error-handling.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Warehouse SaaS</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="feature-detection.html" class="active">Feature Detection</a></li>
+                    <li><a href="my-projects.html">My Projects</a></li>
+                    <li><a href="help.html">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Feature Detection</h1>
+            <p>Upload an aerial image and select features to detect for your warehouse site plan</p>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <div class="form-container">
+                <form id="feature-form">
+                    <div class="form-group">
+                        <h3>Step 1: Upload Aerial Image</h3>
+                        <div class="file-upload" id="upload-area">
+                            <input type="file" id="image-upload" accept="image/*" required>
+                            <p><i class="fas fa-cloud-upload-alt"></i></p>
+                            <p>Drag and drop your image here or click to browse</p>
+                            <p class="small">Supported formats: JPEG, PNG, GIF (Max size: 10MB)</p>
+                        </div>
+                        <div id="file-preview" class="file-preview"></div>
+                        <div class="progress-container" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span class="progress-percentage">0%</span>
+                                <span class="progress-status">Uploading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dimensions-form" class="form-group" style="display: none;">
+                        <h3>Step 2: Set Real-World Dimensions</h3>
+                        <p>Specify the dimensions of the area shown in the image for accurate scaling</p>
+                        
+                        <div class="dimensions-grid">
+                            <div class="dimension-input">
+                                <label for="width">Width:</label>
+                                <input type="number" id="width" min="1" step="0.1" required>
+                            </div>
+                            
+                            <div class="dimension-input">
+                                <label for="height">Height:</label>
+                                <input type="number" id="height" min="1" step="0.1" required>
+                            </div>
+                            
+                            <div class="dimension-input">
+                                <label for="length">Length:</label>
+                                <input type="number" id="length" min="1" step="0.1" required>
+                            </div>
+                            
+                            <div class="dimension-input">
+                                <label for="unit">Unit:</label>
+                                <select id="unit" required>
+                                    <option value="meters">Meters</option>
+                                    <option value="feet">Feet</option>
+                                    <option value="yards">Yards</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h3>Step 3: Select Features to Detect</h3>
+                        <p>Choose which features you want to identify in your site plan</p>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="railroads" name="features" value="railroads">
+                                <label for="railroads">Railroads</label>
+                            </div>
+                            
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="drainage" name="features" value="drainage">
+                                <label for="drainage">Drainage Systems</label>
+                            </div>
+                            
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="utilities" name="features" value="utilities">
+                                <label for="utilities">Utilities</label>
+                            </div>
+                            
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="furniture" name="features" value="furniture">
+                                <label for="furniture">Outdoor Furniture</label>
+                            </div>
+                            
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="barriers" name="features" value="barriers">
+                                <label for="barriers">Fences/Barriers</label>
+                            </div>
+                            
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="vegetation" name="features" value="vegetation">
+                                <label for="vegetation">Trees/Vegetation</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Generate Site Plan</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="result-section" class="result-section" style="display: none;">
+                <div class="api-status connected">
+                    <div class="status-indicator green"></div>
+                    <span>Connected to Feature Detection API</span>
+                </div>
+                
+                <div class="result-tabs">
+                    <div class="result-tab active" data-tab="preview">Preview</div>
+                    <div class="result-tab" data-tab="download">Download Files</div>
+                    <div class="result-tab" data-tab="details">Details</div>
+                </div>
+                
+                <div id="preview-tab" class="result-content active">
+                    <h2>Your Site Plan is Ready!</h2>
+                    <div class="result-preview">
+                        <img src="images/sample-result.jpg" alt="Generated Site Plan Preview">
+                    </div>
+                    
+                    <div class="preview-controls">
+                        <button class="preview-control-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                        <div class="preview-zoom-level">
+                            <span>Zoom:</span>
+                            <span>100%</span>
+                        </div>
+                        <button class="preview-control-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                        <button class="preview-control-btn" title="Reset View"><i class="fas fa-undo"></i></button>
+                    </div>
+                </div>
+                
+                <div id="download-tab" class="result-content">
+                    <h2>Download Your Files</h2>
+                    <p>Your site plan is available in the following formats:</p>
+                    
+                    <div class="file-format-options">
+                        <div class="file-format-option">
+                            <div class="file-format-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h3 class="file-format-name">DXF</h3>
+                            <p class="file-format-description">Drawing Exchange Format - compatible with most CAD software</p>
+                            <a href="#" class="btn btn-primary download-btn" data-format="DXF">Download DXF <i class="fas fa-download"></i></a>
+                        </div>
+                        
+                        <div class="file-format-option">
+                            <div class="file-format-icon">
+                                <i class="fas fa-drafting-compass"></i>
+                            </div>
+                            <h3 class="file-format-name">DWG</h3>
+                            <p class="file-format-description">Native AutoCAD format with full feature support</p>
+                            <a href="#" class="btn btn-secondary download-btn" data-format="DWG">Download DWG <i class="fas fa-download"></i></a>
+                        </div>
+                        
+                        <div class="file-format-option">
+                            <div class="file-format-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <h3 class="file-format-name">PDF</h3>
+                            <p class="file-format-description">Portable Document Format for viewing and sharing</p>
+                            <a href="#" class="btn btn-secondary download-btn" data-format="PDF">Download PDF <i class="fas fa-download"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="details-tab" class="result-content">
+                    <h2>Site Plan Details</h2>
+                    
+                    <div class="result-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Created Date:</span>
+                            <span class="meta-value" id="creation-date">March 22, 2025</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Dimensions:</span>
+                            <span class="meta-value" id="dimensions-value">1000m × 800m × 1200m</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Detected Features:</span>
+                            <div class="detected-features" id="detected-features-list">
+                                <span class="feature-tag">Railroads</span>
+                                <span class="feature-tag">Drainage</span>
+                                <span class="feature-tag">Utilities</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">File Size:</span>
+                            <span class="meta-value" id="file-size">2.4 MB</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" id="save-project-btn">Save to My Projects</button>
+                        <button class="btn btn-outline" id="share-btn">Share</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Warehouse SaaS Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/autocad-generation.js"></script>
+    <script src="js/error-handling.js"></script>
+</body>
+</html>
