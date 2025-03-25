@@ -105,31 +105,35 @@ async function processImageAndGenerateFiles(formData) {
         updateProgress(70, 'Generating AutoCAD files...');
         
         // Make API request to generate AutoCAD files
-        // In a real implementation, this would be an actual API call
-        // const response = await fetch(API_CONFIG.featureDetectionUrl, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(payload)
-        // });
+        const response = await fetch(API_CONFIG.featureDetectionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
         
-        // Simulate API response for demonstration
-        await simulateProgress(70, 95, 'Generating AutoCAD files...', 2000);
+        // Check if response is ok
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        // Parse response
+        const apiResponse = await response.json();
         
         // Update progress
         updateProgress(95, 'Finalizing results...');
         
-        // Simulate API response
+        // Process API response
         const result = {
             success: true,
             message: 'AutoCAD files generated successfully',
             files: {
-                dxf: 'site-plan.dxf',
-                dwg: 'site-plan.dwg',
-                pdf: 'site-plan.pdf'
+                dxf: apiResponse.files?.dxf || 'site-plan.dxf',
+                dwg: apiResponse.files?.dwg || 'site-plan.dwg',
+                pdf: apiResponse.files?.pdf || 'site-plan.pdf'
             },
-            preview: 'images/sample-result.jpg'
+            preview: apiResponse.preview || 'images/sample-result.jpg'
         };
         
         // Complete progress
