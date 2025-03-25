@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: warehouse-ui
+    env: static
+    buildCommand: echo "Static site, no build needed"
+    staticPublishPath: .
+    repo: https://github.com/wesheets/warehouse-ui
+    branch: main
+    autoDeploy: true
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
