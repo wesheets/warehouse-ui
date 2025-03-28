@@ -2,7 +2,7 @@
 
 // API connection configuration
 const API_CONFIG = {
-    featureDetectionUrl: 'https://site-plan-api.onrender.com/generate',
+    featureDetectionUrl: 'https://site-plan-api.onrender.com/api/generate-siteplan',
     timeout: 60000, // 60 seconds timeout
     retryAttempts: 3
 };
@@ -83,20 +83,23 @@ async function processImageAndGenerateFiles(formData) {
         // Update progress
         updateProgress(40, 'Detecting features...');
         
-        // Prepare API request data
+        // Get the image file from form data
         const imageFile = formData.get('image');
-        const features = JSON.parse(formData.get('features'));
-        const dimensions = JSON.parse(formData.get('dimensions'));
         
-        // Convert image to base64 for API request
-        const imageBase64 = await fileToBase64(imageFile);
+        // Create a new FormData object for the API request
+        const apiFormData = new FormData();
+        apiFormData.append('file', imageFile);
         
-        // Prepare request payload
-        const payload = {
-            image_data: imageBase64,
-            features: features,
-            dimensions: dimensions
-        };
+        // Add any additional form fields if needed
+        if (formData.has('features')) {
+            const features = JSON.parse(formData.get('features'));
+            apiFormData.append('features', JSON.stringify(features));
+        }
+        
+        if (formData.has('dimensions')) {
+            const dimensions = JSON.parse(formData.get('dimensions'));
+            apiFormData.append('dimensions', JSON.stringify(dimensions));
+        }
         
         // Simulate feature detection progress
         await simulateProgress(40, 70, 'Detecting features...', 3000);
@@ -107,10 +110,7 @@ async function processImageAndGenerateFiles(formData) {
         // Make API request to generate AutoCAD files
         const response = await fetch(API_CONFIG.featureDetectionUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+            body: apiFormData // Send as multipart/form-data
         });
         
         // Check if response is ok
@@ -133,7 +133,8 @@ async function processImageAndGenerateFiles(formData) {
                 dwg: apiResponse.files?.dwg || 'site-plan.dwg',
                 pdf: apiResponse.files?.pdf || 'site-plan.pdf'
             },
-            preview: apiResponse.preview || 'images/sample-result.jpg'
+            preview: apiResponse.preview || 'images/sample-result.jpg',
+            fileUrls: apiResponse.file_urls || {}
         };
         
         // Complete progress
@@ -182,7 +183,12 @@ function displayResults(result) {
                 this.innerHTML = originalText;
                 
                 // Trigger download
-                if (result.files && result.files[formatLower]) {
+                if (result.fileUrls && result.fileUrls[formatLower]) {
+                    // Use the actual file URL from the API response
+                    window.open('https://site-plan-api.onrender.com' + result.fileUrls[formatLower], '_blank');
+                    showNotification(`${format} file downloaded successfully!`, 'success');
+                } else if (result.files && result.files[formatLower]) {
+                    // Fallback to local download simulation
                     downloadFile(result.files[formatLower], formatLower);
                     showNotification(`${format} file downloaded successfully!`, 'success');
                 } else {
