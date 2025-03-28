@@ -90,6 +90,12 @@ async function processImageAndGenerateFiles(formData) {
         const apiFormData = new FormData();
         apiFormData.append('file', imageFile);
         
+        // Add style parameter (default to 'default' style)
+        apiFormData.append('style', 'default');
+        
+        // Add include_measurements parameter
+        apiFormData.append('include_measurements', 'true');
+        
         // Add any additional form fields if needed
         if (formData.has('features')) {
             const features = JSON.parse(formData.get('features'));
@@ -105,9 +111,9 @@ async function processImageAndGenerateFiles(formData) {
         await simulateProgress(40, 70, 'Detecting features...', 3000);
         
         // Update progress
-        updateProgress(70, 'Generating AutoCAD files...');
+        updateProgress(70, 'Generating site plan...');
         
-        // Make API request to generate AutoCAD files
+        // Make API request to generate site plan
         const response = await fetch(API_CONFIG.featureDetectionUrl, {
             method: 'POST',
             body: apiFormData // Send as multipart/form-data
@@ -125,13 +131,15 @@ async function processImageAndGenerateFiles(formData) {
         // Update progress
         updateProgress(95, 'Finalizing results...');
         
-        // Process API response
+        // Process API response based on the new API format
         const result = {
-            success: true,
-            message: 'AutoCAD files generated successfully',
-            files: apiResponse.files || {},
-            preview: apiResponse.preview || apiResponse.file_urls?.preview || apiResponse.file_urls?.png || 'images/sample-result.jpg',
-            fileUrls: apiResponse.file_urls || {}
+            success: apiResponse.success,
+            message: apiResponse.message || 'Site plan generated successfully',
+            preview: apiResponse.site_plan_url || 'images/sample-result.jpg',
+            fileUrls: {
+                png: apiResponse.site_plan_url
+            },
+            featureAreas: apiResponse.feature_areas || {}
         };
         
         console.log('Preview URL being used:', result.preview); // Log the preview URL for debugging
@@ -142,7 +150,7 @@ async function processImageAndGenerateFiles(formData) {
         return result;
     } catch (error) {
         console.error('Error in processImageAndGenerateFiles:', error);
-        throw new Error('Failed to generate AutoCAD files. Please try again.');
+        throw new Error('Failed to generate site plan. Please try again.');
     }
 }
 
@@ -173,6 +181,38 @@ function displayResults(result) {
         
         // Log the preview URL for debugging
         console.log('Setting preview image to:', previewImg.src);
+    }
+    
+    // Display feature areas if available
+    const detailsTab = document.getElementById('details-tab');
+    if (detailsTab && result.featureAreas) {
+        const detailsContent = detailsTab.querySelector('.tab-content');
+        if (detailsContent) {
+            let areasHtml = '<h3>Feature Areas</h3><ul>';
+            
+            // Add building area if available
+            if (result.featureAreas.building) {
+                areasHtml += `<li><strong>Building Area:</strong> ${result.featureAreas.building} sq ft</li>`;
+            }
+            
+            // Add parking area if available
+            if (result.featureAreas.parking) {
+                areasHtml += `<li><strong>Parking Area:</strong> ${result.featureAreas.parking} sq ft</li>`;
+            }
+            
+            // Add street area if available
+            if (result.featureAreas.street) {
+                areasHtml += `<li><strong>Street/Driveway Area:</strong> ${result.featureAreas.street} sq ft</li>`;
+            }
+            
+            // Add green area if available
+            if (result.featureAreas.green) {
+                areasHtml += `<li><strong>Landscaping Area:</strong> ${result.featureAreas.green} sq ft</li>`;
+            }
+            
+            areasHtml += '</ul>';
+            detailsContent.innerHTML = areasHtml;
+        }
     }
     
     // Set up download buttons
@@ -216,207 +256,52 @@ function displayResults(result) {
                     
                     window.open(fullUrl, '_blank');
                     showNotification(`${format} file downloaded successfully!`, 'success');
-                } else if (result.files && result.files[formatLower]) {
-                    // Fallback to local download simulation
-                    downloadFile(result.files[formatLower], formatLower);
-                    showNotification(`${format} file downloaded successfully!`, 'success');
                 } else {
-                    showNotification(`Error: ${format} file not available.`, 'error');
+                    // Fallback to error message
+                    showNotification(`${format} file not available`, 'error');
                 }
-            }, 1500);
+            }, 1000);
         });
     });
-    
-    // Update details tab with information from the API response
-    updateDetailsTab(result);
-}
-
-// Update details tab with information from the API response
-function updateDetailsTab(result) {
-    // Update creation date
-    const creationDate = document.getElementById('creation-date');
-    if (creationDate) {
-        creationDate.textContent = new Date().toLocaleDateString();
-    }
-    
-    // Update dimensions
-    const dimensionsValue = document.getElementById('dimensions-value');
-    if (dimensionsValue && result.dimensions) {
-        const width = result.dimensions.width || 0;
-        const length = result.dimensions.length || 0;
-        const height = result.dimensions.height || 0;
-        dimensionsValue.textContent = `${width}m × ${length}m × ${height}m`;
-    }
-    
-    // Update detected features
-    const detectedFeaturesList = document.getElementById('detected-features-list');
-    if (detectedFeaturesList && result.elements) {
-        // Clear existing features
-        detectedFeaturesList.innerHTML = '';
-        
-        // Get unique feature types
-        const featureTypes = new Set();
-        if (Array.isArray(result.elements)) {
-            // If elements is an array
-            result.elements.forEach(element => {
-                if (element && element.type) {
-                    featureTypes.add(element.type);
-                }
-            });
-        } else if (typeof result.elements === 'object') {
-            // If elements is an object with categories
-            Object.keys(result.elements).forEach(category => {
-                featureTypes.add(category);
-            });
-        }
-        
-        // Add feature tags
-        featureTypes.forEach(feature => {
-            const featureTag = document.createElement('span');
-            featureTag.className = 'feature-tag';
-            featureTag.textContent = feature.charAt(0).toUpperCase() + feature.slice(1).replace('_', ' ');
-            detectedFeaturesList.appendChild(featureTag);
-        });
-    }
-    
-    // Update file size
-    const fileSize = document.getElementById('file-size');
-    if (fileSize) {
-        fileSize.textContent = '2.4 MB'; // Placeholder, would be dynamic in a real implementation
-    }
-}
-
-// Helper function to convert file to base64
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            // Extract base64 data from the result
-            // Format is "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
-            const base64String = reader.result.split(',')[1];
-            resolve(base64String);
-        };
-        reader.onerror = error => reject(error);
-    });
-}
-
-// Helper function to simulate progress updates
-function simulateProgress(start, end, message, duration) {
-    return new Promise(resolve => {
-        const steps = 10;
-        const increment = (end - start) / steps;
-        const stepDuration = duration / steps;
-        let currentStep = 0;
-        
-        const interval = setInterval(() => {
-            currentStep++;
-            const progress = start + (increment * currentStep);
-            
-            updateProgress(progress, message);
-            
-            if (currentStep >= steps) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, stepDuration);
-    });
-}
-
-// Update progress bar and text
-function updateProgress(percentage, status) {
-    const progressBar = document.querySelector('.progress-bar-fill');
-    const progressPercentage = document.querySelector('.progress-percentage');
-    const progressStatus = document.querySelector('.progress-status');
-    
-    if (progressBar) {
-        progressBar.style.width = `${percentage}%`;
-    }
-    
-    if (progressPercentage) {
-        progressPercentage.textContent = `${Math.round(percentage)}%`;
-    }
-    
-    if (progressStatus && status) {
-        progressStatus.textContent = status;
-    }
-}
-
-// Trigger file download
-function downloadFile(filename, format) {
-    // In a real implementation, this would download actual files from the server
-    // For demonstration, we'll create dummy content
-    
-    let content = '';
-    let mimeType = '';
-    
-    switch (format) {
-        case 'dxf':
-        case 'dwg':
-            content = 'AutoCAD file content would be here in a real implementation';
-            mimeType = 'application/octet-stream';
-            break;
-        case 'pdf':
-            content = 'PDF content would be here in a real implementation';
-            mimeType = 'application/pdf';
-            break;
-        default:
-            content = 'File content';
-            mimeType = 'text/plain';
-    }
-    
-    // Create a blob and download link
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    
-    // Clean up
-    setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }, 100);
 }
 
 // Collect form data
 function collectFormData() {
     const formData = new FormData();
     
-    // Get the uploaded image
+    // Get the uploaded image file
     const fileInput = document.getElementById('image-upload');
     if (fileInput && fileInput.files.length > 0) {
         formData.append('image', fileInput.files[0]);
     }
     
     // Get dimensions
-    const width = document.getElementById('width')?.value || 0;
-    const height = document.getElementById('height')?.value || 0;
-    const length = document.getElementById('length')?.value || 0;
-    const unit = document.getElementById('unit')?.value || 'meters';
+    const width = document.getElementById('width')?.value;
+    const height = document.getElementById('height')?.value;
+    const length = document.getElementById('length')?.value;
+    const unit = document.getElementById('unit')?.value;
     
-    const dimensions = {
-        width: parseFloat(width),
-        height: parseFloat(height),
-        length: parseFloat(length),
-        unit: unit
-    };
-    
-    formData.append('dimensions', JSON.stringify(dimensions));
+    if (width && height && length) {
+        const dimensions = {
+            width: parseFloat(width),
+            height: parseFloat(height),
+            length: parseFloat(length),
+            unit: unit || 'ft'
+        };
+        formData.append('dimensions', JSON.stringify(dimensions));
+    }
     
     // Get selected features
     const featureCheckboxes = document.querySelectorAll('input[name="features"]:checked');
-    const features = Array.from(featureCheckboxes).map(checkbox => checkbox.value);
-    
-    formData.append('features', JSON.stringify(features));
+    if (featureCheckboxes.length > 0) {
+        const features = Array.from(featureCheckboxes).map(checkbox => checkbox.value);
+        formData.append('features', JSON.stringify(features));
+    }
     
     return formData;
 }
 
-// Validate form before submission
+// Validate form
 function validateForm() {
     // Check if image is uploaded
     const fileInput = document.getElementById('image-upload');
@@ -426,231 +311,71 @@ function validateForm() {
     }
     
     // Check dimensions
-    const width = document.getElementById('width');
-    const height = document.getElementById('height');
-    const length = document.getElementById('length');
+    const width = document.getElementById('width')?.value;
+    const height = document.getElementById('height')?.value;
+    const length = document.getElementById('length')?.value;
     
-    if (width && (isNaN(width.value) || parseFloat(width.value) <= 0)) {
-        showNotification('Please enter a valid width', 'error');
-        width.focus();
-        return false;
-    }
-    
-    if (height && (isNaN(height.value) || parseFloat(height.value) <= 0)) {
-        showNotification('Please enter a valid height', 'error');
-        height.focus();
-        return false;
-    }
-    
-    if (length && (isNaN(length.value) || parseFloat(length.value) <= 0)) {
-        showNotification('Please enter a valid length', 'error');
-        length.focus();
+    if (!width || !height || !length) {
+        showNotification('Please enter all dimensions', 'error');
         return false;
     }
     
     return true;
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initFileUpload();
-    initAutoCADGeneration();
-    initProjectManagement();
-});
-
-// Initialize file upload functionality
-function initFileUpload() {
-    const uploadArea = document.getElementById('upload-area');
-    const fileInput = document.getElementById('image-upload');
-    const filePreview = document.getElementById('file-preview');
-    const dimensionsForm = document.getElementById('dimensions-form');
+// Update progress bar
+function updateProgress(percent, message) {
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.querySelector('.progress-text');
     
-    if (!uploadArea || !fileInput || !filePreview) return;
-    
-    // Handle drag and drop
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', function() {
-        uploadArea.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        
-        if (e.dataTransfer.files.length) {
-            fileInput.files = e.dataTransfer.files;
-            handleFileSelect(e.dataTransfer.files[0]);
-        }
-    });
-    
-    // Handle file input change
-    fileInput.addEventListener('change', function() {
-        if (this.files.length) {
-            handleFileSelect(this.files[0]);
-        }
-    });
-    
-    // Handle file selection
-    function handleFileSelect(file) {
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-            showNotification('Please select a valid image file (JPEG, PNG, GIF)', 'error');
-            return;
-        }
-        
-        // Validate file size (max 10MB)
-        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-        if (file.size > maxSize) {
-            showNotification('File size exceeds 10MB limit', 'error');
-            return;
-        }
-        
-        // Create file preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            filePreview.innerHTML = `
-                <div class="file-preview-item">
-                    <img src="${e.target.result}" alt="${file.name}">
-                    <div class="file-info">
-                        <span class="file-name">${file.name}</span>
-                        <span class="file-size">${formatFileSize(file.size)}</span>
-                        <button class="remove-file-btn">Remove</button>
-                    </div>
-                </div>
-            `;
-            
-            // Show dimensions form
-            if (dimensionsForm) {
-                dimensionsForm.style.display = 'block';
-            }
-            
-            // Handle remove button
-            const removeBtn = filePreview.querySelector('.remove-file-btn');
-            if (removeBtn) {
-                removeBtn.addEventListener('click', function() {
-                    filePreview.innerHTML = '';
-                    fileInput.value = '';
-                    if (dimensionsForm) {
-                        dimensionsForm.style.display = 'none';
-                    }
-                });
-            }
-        };
-        
-        reader.readAsDataURL(file);
+    if (progressBar) {
+        progressBar.style.width = `${percent}%`;
+        progressBar.setAttribute('aria-valuenow', percent);
     }
     
-    // Format file size
-    function formatFileSize(bytes) {
-        if (bytes < 1024) return bytes + ' B';
-        else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-        else return (bytes / 1048576).toFixed(2) + ' MB';
+    if (progressText) {
+        progressText.textContent = message || `${percent}%`;
     }
 }
 
-// Initialize project management functionality
-function initProjectManagement() {
-    // This would handle saving projects, loading saved projects, etc.
-    // For now, it's just a placeholder
-    const saveProjectBtn = document.getElementById('save-project-btn');
-    if (saveProjectBtn) {
-        saveProjectBtn.addEventListener('click', function() {
-            showNotification('Project saved successfully!', 'success');
-        });
-    }
-    
-    const shareBtn = document.getElementById('share-btn');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', function() {
-            showNotification('Share functionality coming soon!', 'info');
-        });
-    }
-    
-    // Set up result tabs
-    const resultTabs = document.querySelectorAll('.result-tab');
-    resultTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remove active class from all tabs
-            resultTabs.forEach(t => t.classList.remove('active'));
+// Simulate progress for better user experience
+async function simulateProgress(start, end, message, duration) {
+    return new Promise(resolve => {
+        const steps = 10;
+        const increment = (end - start) / steps;
+        const stepDuration = duration / steps;
+        let currentProgress = start;
+        let step = 0;
+        
+        const interval = setInterval(() => {
+            step++;
+            currentProgress += increment;
             
-            // Add active class to clicked tab
-            this.classList.add('active');
-            
-            // Hide all content sections
-            const contentSections = document.querySelectorAll('.result-content');
-            contentSections.forEach(section => section.classList.remove('active'));
-            
-            // Show selected content section
-            const tabId = this.getAttribute('data-tab');
-            const contentSection = document.getElementById(`${tabId}-tab`);
-            if (contentSection) {
-                contentSection.classList.add('active');
+            if (step >= steps) {
+                clearInterval(interval);
+                updateProgress(end, message);
+                resolve();
+            } else {
+                updateProgress(Math.round(currentProgress), message);
             }
-        });
+        }, stepDuration);
     });
 }
 
 // Show notification
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-icon">
-            <i class="fas ${getIconForType(type)}"></i>
-        </div>
-        <div class="notification-content">
-            <p>${message}</p>
-        </div>
-        <button class="notification-close">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Add to document
-    document.body.appendChild(notification);
-    
-    // Show notification
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Set up close button
-    const closeBtn = notification.querySelector('.notification-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        });
-    }
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-        if (document.body.contains(notification)) {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }
-    }, 5000);
-    
-    // Helper function to get icon for notification type
-    function getIconForType(type) {
-        switch (type) {
-            case 'success': return 'fa-check-circle';
-            case 'error': return 'fa-exclamation-circle';
-            case 'warning': return 'fa-exclamation-triangle';
-            case 'info':
-            default: return 'fa-info-circle';
+function showNotification(message, type) {
+    // Check if notification function exists (defined in another file)
+    if (typeof showToast === 'function') {
+        showToast(message, type);
+    } else {
+        // Fallback to alert
+        if (type === 'error') {
+            alert(`Error: ${message}`);
+        } else {
+            alert(message);
         }
     }
 }
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initAutoCADGeneration);
