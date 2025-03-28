@@ -130,9 +130,11 @@ async function processImageAndGenerateFiles(formData) {
             success: true,
             message: 'AutoCAD files generated successfully',
             files: apiResponse.files || {},
-            preview: apiResponse.preview || apiResponse.file_urls?.preview || 'images/sample-result.jpg',
+            preview: apiResponse.preview || apiResponse.file_urls?.preview || apiResponse.file_urls?.png || 'images/sample-result.jpg',
             fileUrls: apiResponse.file_urls || {}
         };
+        
+        console.log('Preview URL being used:', result.preview); // Log the preview URL for debugging
         
         // Complete progress
         updateProgress(100, 'Complete!');
@@ -196,9 +198,21 @@ function displayResults(result) {
                 if (result.fileUrls && result.fileUrls[formatLower]) {
                     // Use the actual file URL from the API response
                     const fileUrl = result.fileUrls[formatLower];
-                    const fullUrl = fileUrl.startsWith('/') 
-                        ? 'https://site-plan-api.onrender.com' + fileUrl 
-                        : fileUrl;
+                    
+                    // Check if the URL is a relative path or full URL
+                    let fullUrl;
+                    if (fileUrl.startsWith('/')) {
+                        // It's a relative path, prepend the API base URL
+                        fullUrl = 'https://site-plan-api.onrender.com' + fileUrl;
+                    } else if (fileUrl.startsWith('http')) {
+                        // It's already a full URL
+                        fullUrl = fileUrl;
+                    } else {
+                        // It's a local path, prepend the API base URL
+                        fullUrl = 'https://site-plan-api.onrender.com/' + fileUrl;
+                    }
+                    
+                    console.log(`Downloading ${format} from URL:`, fullUrl); // Log the download URL for debugging
                     
                     window.open(fullUrl, '_blank');
                     showNotification(`${format} file downloaded successfully!`, 'success');
